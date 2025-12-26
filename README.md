@@ -4,8 +4,8 @@
 ```bash
 npm ci
 npm run dev              # dev server
-npm run build            # usa vite.app.config.ts
-npm run preview          # testar build
+npm run build            # usa vite.app.config.ts (outDir dist-app)
+npm run preview:app      # testar build do app
 npm run test             # smoke Vitest
 ```
 
@@ -19,15 +19,15 @@ Se a API base ficar vazia, o app expõe `/diagnostico` mostrando o valor resolvi
 
 ## Deploy (Render)
 - Build command: `npm run build`
-- Publish dir: `dist-app`
+- Publish dir: `dist-app` (entrada app.html)
 - Env: `VITE_API_BASE_URL=https://eagl-backend.onrender.com`
 - Headers recomendados:
   - `/*` -> `Cache-Control: no-store` (já aplicado)
   - `/assets/*` -> `Cache-Control: public, max-age=31536000, immutable` (opcional)
-- SPA rewrite: manter default do Render (todas rotas -> index/app sem afetar `/assets/*`).
+- SPA rewrite: manter default do Render (todas rotas -> app.html sem afetar `/assets/*`).
 
 ## Diagnóstico de tela preta
-1. Rodar `npm run build && npm run preview`.
+1. Rodar `npm run build && npm run preview:app`.
 2. Abrir DevTools: Console e Network (404 de JS/CSS/asset?).
 3. Ver `/diagnostico`: versão (package.json), env, apiBaseUrl, health da API.
 4. ErrorBoundary global exibe erro em tela e loga com prefixo `[EAGL-APP]`.
@@ -45,4 +45,4 @@ Vitest (`npm run test`) renderiza o App com ErrorBoundary/AuthProvider e falha s
   - https://eagl-frontend.onrender.com
   - http://localhost:5173
   - http://127.0.0.1:5173
-- Limpar cache/aba anônima após redeploy para baixar o bundle novo (hash diferente).***
+- Limpar cache/aba anônima após redeploy para baixar o bundle novo (hash diferente).
