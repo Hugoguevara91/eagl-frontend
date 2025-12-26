@@ -19,16 +19,6 @@ export default function Login() {
     setPassword("");
   }, []);
 
-  // Evita spam de health-check em produção; front não precisa testar aqui.
-  useEffect(() => {
-    if (import.meta.env.DEV) {
-      const base = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
-      if (base) {
-        fetch(`${base}/api/health`).catch((err) => console.error("API health error", base, err));
-      }
-    }
-  }, []);
-
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
