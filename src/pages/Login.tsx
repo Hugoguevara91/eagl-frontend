@@ -19,11 +19,14 @@ export default function Login() {
     setPassword("");
   }, []);
 
-  // Diagnóstico: valida a base da API e o /api/health em runtime (útil em produção)
+  // Evita spam de health-check em produção; front não precisa testar aqui.
   useEffect(() => {
-    const base = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
-    if (!base) return;
-    fetch(`${base}/api/health`).catch((err) => console.error("API health error", base, err));
+    if (import.meta.env.DEV) {
+      const base = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+      if (base) {
+        fetch(`${base}/api/health`).catch((err) => console.error("API health error", base, err));
+      }
+    }
   }, []);
 
   const onSubmit = async (e: FormEvent) => {
