@@ -8,7 +8,15 @@ import "./index.css";
 const originalFetch = window.fetch.bind(window);
 let healthCalls = 0;
 window.fetch = (...args) => {
-  const url = typeof args[0] === "string" ? args[0] : args[0]?.url;
+  const target = args[0];
+  const url =
+    typeof target === "string"
+      ? target
+      : target instanceof URL
+        ? target.toString()
+        : target instanceof Request
+          ? target.url
+          : "";
   if (url && url.includes("/api/health")) {
     if (healthCalls >= 1) {
       // responde localmente para evitar tráfego e evitar loops
