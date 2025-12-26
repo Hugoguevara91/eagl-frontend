@@ -1,0 +1,18 @@
+{
+  "projects": {
+    "default": "eagl-bd262"
+  },
+  "targets": {
+    "eagl-bd262": {
+      "hosting": {
+        "landing": [
+          "eagl-landing"
+        ],
+        "app": [
+          "eagl-bd262"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
