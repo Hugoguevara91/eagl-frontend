@@ -1,4 +1,4 @@
-import { API_BASE_URL, defaultHeaders } from "../config/api";
+import { buildApiUrl } from "../config/api";
 
 type Options = {
   method?: string;
@@ -7,19 +7,13 @@ type Options = {
   token?: string | null;
 };
 
-function buildUrl(path: string) {
-  const cleanPath = path.startsWith("/") ? path : `/${path}`;
-  const withApi = cleanPath.startsWith("/api/") ? cleanPath : `/api${cleanPath}`;
-  return `${API_BASE_URL}${withApi}`;
-}
-
 export async function apiFetch<T = any>(path: string, options: Options = {}): Promise<T> {
   const { method = "GET", headers = {}, body, token } = options;
-  const url = buildUrl(path);
+  const url = buildApiUrl(path);
   const res = await fetch(url, {
     method,
     headers: {
-      ...defaultHeaders,
+      "Content-Type": "application/json",
       ...headers,
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },

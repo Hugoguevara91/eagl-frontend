@@ -3,8 +3,8 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import { ErrorBoundary } from "./components/ErrorBoundary";
-import { applyRuntimeConfig, loadRuntimeConfig, resolveApiBase } from "./config/runtime";
-import { setApiBase } from "./config/api";
+import { loadRuntimeConfig, resolveApiBase } from "./config/runtime";
+import { applyRuntimeConfig } from "./config/api";
 import "./index.css";
 
 // Kill switch: evita loops de health-check e silencia logs repetitivos.
@@ -44,7 +44,6 @@ console.log = (...args: any[]) => {
 async function bootstrap() {
   const cfg = await loadRuntimeConfig();
   applyRuntimeConfig(cfg);
-  setApiBase(resolveApiBase(cfg));
   (window as any).__APP_CONFIG__ = {
     apiBaseUrl: resolveApiBase(cfg),
     environment: cfg.environment || (import.meta as any).env?.MODE || "prod",
