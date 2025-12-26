@@ -11,13 +11,13 @@ vi.mock("../config/runtime", () => ({
 
 describe("smoke", () => {
   it("render app shell without crash", () => {
-    render(
+    const { container } = render(
       <AuthProvider>
         <ErrorBoundary>
           <App />
         </ErrorBoundary>
       </AuthProvider>,
     );
-    expect(document.getElementById("root")).toBeTruthy();
+    expect(container.firstChild).toBeTruthy();
   });
 });
