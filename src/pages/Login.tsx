@@ -23,10 +23,7 @@ export default function Login() {
   useEffect(() => {
     const base = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
     if (!base) return;
-    fetch(`${base}/api/health`)
-      .then((r) => r.json())
-      .then((res) => console.log("API health", base, res))
-      .catch((err) => console.error("API health error", base, err));
+    fetch(`${base}/api/health`).catch((err) => console.error("API health error", base, err));
   }, []);
 
   const onSubmit = async (e: FormEvent) => {
@@ -49,7 +46,7 @@ export default function Login() {
   };
 
   if (isAuthenticated) {
-    return <Navigate to="/painel" replace />;
+    return <Navigate to="/app/painel" replace />;
   }
 
   return (

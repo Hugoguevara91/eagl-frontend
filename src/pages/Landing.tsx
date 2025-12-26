@@ -17,7 +17,7 @@ const benefits = [
 
 export default function Landing() {
   const { isAuthenticated } = useAuth();
-  const ctaHref = isAuthenticated ? "/painel" : "/login";
+  const ctaHref = isAuthenticated ? "/app/painel" : "/login";
   const PRIMARY = BRAND.palette?.primary ?? "#00C8FF";
   const ACCENT = BRAND.palette?.accent ?? "#EC4899";
   const heroLogo = BRAND.logo || BRAND.logoAlt || BRAND.logoWhite;
