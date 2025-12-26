@@ -1,12 +1,25 @@
-// Configuração central da API: exige VITE_API_BASE_URL e normaliza sem barra final.
-const rawBase = import.meta.env.VITE_API_BASE_URL;
+import { resolveApiBase, type RuntimeConfig } from "./runtime";
 
-if (!rawBase) {
-  throw new Error("VITE_API_BASE_URL não configurada. Defina a URL base da API (ex.: https://eagl-backend.onrender.com)");
+let cachedBase: string | null = null;
+
+export function setApiBase(base: string) {
+  cachedBase = base.replace(/\/$/, "");
 }
 
-export const API_BASE_URL = rawBase.replace(/\/$/, "");
+export function getApiBase(): string {
+  if (cachedBase) return cachedBase;
+  const envBase = (import.meta as any).env?.VITE_API_BASE_URL || "";
+  return (envBase || "http://127.0.0.1:8000").replace(/\/$/, "");
+}
 
-export const defaultHeaders = {
-  "Content-Type": "application/json",
-};
+export function buildApiUrl(path: string) {
+  const base = cachedBase || getApiBase();
+  const clean = path.startsWith("/") ? path : `/${path}`;
+  const withApi = clean.startsWith("/api/") ? clean : `/api${clean}`;
+  return `${base}${withApi}`;
+}
+
+export function applyRuntimeConfig(cfg: RuntimeConfig) {
+  const base = resolveApiBase(cfg);
+  setApiBase(base);
+}

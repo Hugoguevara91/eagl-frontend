@@ -10,6 +10,7 @@ import Relatorios from "./pages/Relatorios";
 import Configuracoes from "./pages/Configuracoes";
 import Usuarios from "./pages/Usuarios";
 import Perfis from "./pages/Perfis";
+import Diagnostico from "./pages/Diagnostico";
 
 // ---------- Guards ----------
 function PrivateRoute({ children }: { children: React.ReactElement }) {
@@ -32,6 +33,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/painel" element={<Navigate to="/app/painel" replace />} />
+        <Route path="/diagnostico" element={<Diagnostico />} />
 
         <Route
           path="/app/painel"

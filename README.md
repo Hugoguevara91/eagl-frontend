@@ -1,91 +1,48 @@
-# React + TypeScript + Vite
+# EAGL Frontend (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Rodar local
+```bash
+npm ci
+npm run dev              # dev server
+npm run build            # usa vite.app.config.ts
+npm run preview          # testar build
+npm run test             # smoke Vitest
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Runtime config e API base
+O app lê `public/config.json` em produção e usa esta ordem de prioridade:
+1. `config.json` (`apiBaseUrl`, `environment`)
+2. `VITE_API_BASE_URL`
+3. Fallback dev: `http://127.0.0.1:8000/api`
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Se a API base ficar vazia, o app expõe `/diagnostico` mostrando o valor resolvido. `window.__APP_CONFIG__` traz o config carregado.
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+## Deploy (Render)
+- Build command: `npm run build`
+- Publish dir: `dist-app`
+- Env: `VITE_API_BASE_URL=https://eagl-backend.onrender.com`
+- Headers recomendados:
+  - `/*` -> `Cache-Control: no-store` (já aplicado)
+  - `/assets/*` -> `Cache-Control: public, max-age=31536000, immutable` (opcional)
+- SPA rewrite: manter default do Render (todas rotas -> index/app sem afetar `/assets/*`).
 
-## Deploy Firebase Hosting (landing vs app)
+## Diagnóstico de tela preta
+1. Rodar `npm run build && npm run preview`.
+2. Abrir DevTools: Console e Network (404 de JS/CSS/asset?).
+3. Ver `/diagnostico`: versão (package.json), env, apiBaseUrl, health da API.
+4. ErrorBoundary global exibe erro em tela e loga com prefixo `[EAGL-APP]`.
 
-1) Vincular targets (uma vez):
-```
-firebase target:apply hosting landing eagl-landing
-firebase target:apply hosting app eagl-bd262
-```
-2) Publicar landing:
-```
-npm run build:landing
-firebase deploy --only hosting:landing
-```
-3) Publicar app:
-```
-npm run build:app
-firebase deploy --only hosting:app
-```
+## Rota /diagnostico
+Mostra versão, env, API base resolvida, resultado de `/health` e botão de teste de chamada simples.
+
+## Teste de fumaça
+Vitest (`npm run test`) renderiza o App com ErrorBoundary/AuthProvider e falha se houver crash de inicialização.
+
+## Checklist de produção
+- Frontend: build `npm run build` -> publicar `dist-app`.
+- Backend: `/api/auth/me` e `/api/health` funcionando; CORS com origens:
+  - https://app.eagl.com.br
+  - https://eagl-frontend.onrender.com
+  - http://localhost:5173
+  - http://127.0.0.1:5173
+- Limpar cache/aba anônima após redeploy para baixar o bundle novo (hash diferente).***

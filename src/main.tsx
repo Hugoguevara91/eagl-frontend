@@ -2,6 +2,9 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
+import { ErrorBoundary } from "./components/ErrorBoundary";
+import { applyRuntimeConfig, loadRuntimeConfig, resolveApiBase } from "./config/runtime";
+import { setApiBase } from "./config/api";
 import "./index.css";
 
 // Kill switch: evita loops de health-check e silencia logs repetitivos.
@@ -38,10 +41,24 @@ console.log = (...args: any[]) => {
   originalLog(...args);
 };
 
-ReactDOM.createRoot(document.getElementById("root")!).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <App />
-    </AuthProvider>
-  </React.StrictMode>,
-);
+async function bootstrap() {
+  const cfg = await loadRuntimeConfig();
+  applyRuntimeConfig(cfg);
+  setApiBase(resolveApiBase(cfg));
+  (window as any).__APP_CONFIG__ = {
+    apiBaseUrl: resolveApiBase(cfg),
+    environment: cfg.environment || (import.meta as any).env?.MODE || "prod",
+  };
+
+  ReactDOM.createRoot(document.getElementById("root")!).render(
+    <React.StrictMode>
+      <AuthProvider>
+        <ErrorBoundary>
+          <App />
+        </ErrorBoundary>
+      </AuthProvider>
+    </React.StrictMode>,
+  );
+}
+
+bootstrap();
