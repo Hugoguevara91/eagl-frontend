@@ -4,7 +4,7 @@ import App from "./App";
 import { AuthProvider } from "./context/AuthContext";
 import "./index.css";
 
-// Proteção contra loops de health-check: garante no máx. 1 chamada e silencia logs repetitivos.
+// Kill switch: evita loops de health-check e silencia logs repetitivos.
 const originalFetch = window.fetch.bind(window);
 let healthCalls = 0;
 window.fetch = (...args) => {
@@ -19,7 +19,6 @@ window.fetch = (...args) => {
           : "";
   if (url && url.includes("/api/health")) {
     if (healthCalls >= 1) {
-      // responde localmente para evitar tráfego e evitar loops
       return Promise.resolve(
         new Response(JSON.stringify({ ok: true, cached: true }), {
           status: 200,

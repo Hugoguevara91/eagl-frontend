@@ -5,45 +5,6 @@
     <link rel="icon" type="image/png" href="/brand/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>App EAGL</title>
-    <script>
-      // Kill switch: evita loops de health-check e silencia logs repetitivos antes do app carregar.
-      (function () {
-        const originalFetch = window.fetch ? window.fetch.bind(window) : null;
-        let healthCount = 0;
-        if (originalFetch) {
-          window.fetch = (...args) => {
-            const target = args[0];
-            const url =
-              typeof target === "string"
-                ? target
-                : target instanceof URL
-                  ? target.toString()
-                  : target instanceof Request
-                    ? target.url
-                    : "";
-            if (url && url.includes("/api/health")) {
-              if (healthCount >= 1) {
-                return Promise.resolve(
-                  new Response(JSON.stringify({ ok: true, cached: true }), {
-                    status: 200,
-                    headers: { "Content-Type": "application/json" },
-                  }),
-                );
-              }
-              healthCount += 1;
-            }
-            return originalFetch(...args);
-          };
-        }
-
-        const originalLog = console.log;
-        console.log = (...args) => {
-          const first = args[0];
-          if (typeof first === "string" && first.toLowerCase().includes("api health")) return;
-          return originalLog(...args);
-        };
-      })();
-    </script>
   </head>
   <body>
     <div id="root"></div>
